@@ -1,19 +1,16 @@
 import './utenti.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../modal/modal';
+import { getUtenti, createUtente, deleteUtente } from '../../service/utentiService';
+
 
 function Utenti() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [chose, changeChose] = useState(Number)
-
-  const user = [
-    { username: 'luigib99', email: 'luigib99@gmail.com', dataCreazione: '25/02/2025', dataUltimaModifica:'25/02/2025', ruolo: 'User' },
-    { username: 'gptocchi92', email: 'gianpaoloTocchi92@gmail.com', dataCreazione: '26/02/2025', dataUltimaModifica:'25/02/2025', ruolo: 'User' },
-    { username: 'fedefanfoni', email: 'federicaFanfoni@gmail.com', dataCreazione: '28/02/2025', dataUltimaModifica:'25/02/2025', ruolo: 'User' },
-    { username: 'andreaCesa', email: 'andreacesarini@gmail.com', dataCreazione: '01/03/2025', dataUltimaModifica:'03/03/2025', ruolo: 'User' },
-  ];
+  const [utenti, setUtenti] = useState([]);
+  const [newUser, setNewUser] = useState({ username: '', email: '', dataCreazione:'', dataUltimaModifica:'',ruolo:''});
 
   const openModifyModal = (user) => {
     setSelectedData(user);
@@ -41,13 +38,48 @@ function Utenti() {
   const handleRowClick = (username) => {
     setSelectedRow(username === selectedRow ? null : username);
   };
+  
+  //READ ALL
+  useEffect(() => {
+    const fetchUtenti = async () => {
+      try {
+        const data = await getUtenti();
+        setUtenti(data);
+      } catch (error) {
+        console.error('Errore durante il caricamento degli utenti:', error);
+      }
+    };
+    fetchUtenti();
+  }, []);
+
+  //CREATE
+  const handleAddUser = async () => {
+    try {
+      const createdUser = await createUtente(newUser);
+      setUtenti([...utenti, createdUser]);
+      setNewUser({ username: '', email: '', password:'', ruolo:'' });
+    } catch (error) {
+      console.error('Errore durante l\'aggiunta di un nuovo utente:', error);
+    }
+  };
+
+  //DELETE
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUtente(id);
+      Utenti.setUtenti(Utenti.utenti.filter((utente) => utente.id !== id));
+    } catch (error) {
+      console.error('Errore durante l\'eliminazione dell\'utente:', error);
+    }
+  };
+
 
   return (
     <div>
       <h1 className='mt-5'>UTENTI REGISTRATI</h1>
       <div className='sinistra'>
       <button 
-      onClick={() => { openAddModal(user); }} 
+      onClick={() => { openAddModal(newUser); }} 
       type="button" 
       className="btn btn-primary"
       style={{width:'200px'}}>Nuovo utente</button>
@@ -56,7 +88,7 @@ function Utenti() {
         <thead className="table table-bordered table-danger">
           <tr>
             <th style={{width:'20%'}} scope="col">Username</th>
-            <th cstyle={{width:'20%'}} scope="col">Email</th>
+            <th style={{width:'20%'}} scope="col">Email</th>
             <th style={{width:'10%'}} scope="col">Data creazione</th>
             <th style={{width:'10%'}} scope="col">Data ultima modifica</th>
             <th style={{width:'15%'}} scope="col">Ruolo</th>
@@ -64,18 +96,18 @@ function Utenti() {
           </tr>
         </thead>
         <tbody>
-          {user.map((user) => (
-            <tr key={user.username} onClick={() => handleRowClick(user.username)} style={{ cursor: 'pointer' }}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.dataCreazione}</td>
-              <td>{user.dataUltimaModifica}</td>
-              <td>{user.ruolo}</td>
+          {utenti.map((utente) => (
+            <tr key={utente.username} onClick={() => handleRowClick(utente.username)} style={{ cursor: 'pointer' }}>
+              <td>{utente.username}</td>
+              <td>{utente.email}</td>
+              <td>{utente.dataCreazione}</td>
+              <td>{utente.dataUltimaModifica}</td>
+              <td>{utente.ruolo}</td>
               <td>
-                {selectedRow === user.username && (
+                {selectedRow === utenti.username && (
                   <div style={{display:'block'}}>
-                    <button onClick={() => { openModifyModal(user); }} className="btn btn-primary mr-2">MODIFICA</button>
-                    <button onClick={() => { openDeleteModal(user); }} className="btn btn-danger">ELIMINA</button>
+                    <button onClick={() => { openModifyModal(utente); }} className="btn btn-primary mr-2">MODIFICA</button>
+                    <button onClick={() => { openDeleteModal(utente); }} className="btn btn-danger">ELIMINA</button>
                   </div>
                 )}
               </td>
@@ -83,7 +115,7 @@ function Utenti() {
           ))}
         </tbody>
       </table>
-      {isOpen && <Modal chose={chose} user={selectedData} onClose={closeModal} />}
+      {isOpen && <Modal chose={chose} utente={selectedData} onClose={closeModal} />}
     </div>
   );
 }

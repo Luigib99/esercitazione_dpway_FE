@@ -1,7 +1,9 @@
 import './modal.css';
 import React from 'react';
+import Utenti from '../utenti/utenti';
 
 function Modal({ chose, user, onClose }) {
+
   return (
     <div>
       {/* MODIFY MODAL */}
@@ -88,7 +90,7 @@ function Modal({ chose, user, onClose }) {
             </div>
             <div className="modal-footer">
               <button onClick={onClose} type="button" className="btn btn-danger">NO</button>
-              <button type="submit" class="btn btn-primary">SI</button>
+              <button onClick={Utenti.handleDeleteUser(user.id)}type="submit" class="btn btn-primary">SI</button>
             </div>
           </div>
         </div>
