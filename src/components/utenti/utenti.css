@@ -1,0 +1,19 @@
+table {
+  margin-top: 30px;
+  padding-right: 30px;
+}
+
+td {
+  height: 60px;
+  align-content: center;
+}
+
+th {
+  align-content: center;
+}
+
+.sinistra {
+  display: flex;
+  justify-content: start;
+  margin-left: 80px;
+}
