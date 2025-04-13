@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'http://api/utenti';
+const apiUrl = 'http://localhost:3000/users';
 const axiosInstance = axios.create({
   baseURL: apiUrl,
   headers: {
@@ -11,13 +11,15 @@ const axiosInstance = axios.create({
 //GET ALL
 export const getUtenti = async () => {
   try {
-    const response = await axiosInstance.get('/getUtenti');
+    const response = await axiosInstance.get('/readAll');
+    console.log('Risposta getUtenti:', response.data); // 👈 aggiungi questo
     return response.data;
   } catch (error) {
     console.error('Errore durante il recupero degli utenti:', error);
     throw error;
   }
 };
+
 
 //POST
 export const createUtente = async (user) => {
@@ -33,7 +35,7 @@ export const createUtente = async (user) => {
 //PUT
 export const updateUtente = async (id, user) => {
   try {
-    const response = await axiosInstance.put(/updateUtente/`${id}`, user);
+    const response = await axiosInstance.put(`/updateUtente/${id}`, user);
     return response.data;
   } catch (error) {
     console.error('Errore durante l\'aggiornamento dell\'utente:', error);
@@ -44,7 +46,7 @@ export const updateUtente = async (id, user) => {
 // DELETE
 export const deleteUtente = async (id) => {
   try {
-    await axiosInstance.delete(/deleteUtente/`${id}`);
+    await axiosInstance.delete(`/deleteUtente/${id}`);
   } catch (error) {
     console.error('Errore durante l\'eliminazione dell\'utente:', error);
     throw error;

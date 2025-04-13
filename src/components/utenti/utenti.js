@@ -44,13 +44,15 @@ function Utenti() {
     const fetchUtenti = async () => {
       try {
         const data = await getUtenti();
-        setUtenti(data);
+        console.log('Utenti ricevuti:', data);
+        setUtenti(data.users);
       } catch (error) {
         console.error('Errore durante il caricamento degli utenti:', error);
       }
     };
     fetchUtenti();
   }, []);
+  
 
   //CREATE
   const handleAddUser = async () => {
@@ -67,7 +69,7 @@ function Utenti() {
   const handleDeleteUser = async (id) => {
     try {
       await deleteUtente(id);
-      Utenti.setUtenti(Utenti.utenti.filter((utente) => utente.id !== id));
+      setUtenti(utenti.filter((utente) => utente.id !== id));
     } catch (error) {
       console.error('Errore durante l\'eliminazione dell\'utente:', error);
     }
@@ -100,11 +102,14 @@ function Utenti() {
             <tr key={utente.username} onClick={() => handleRowClick(utente.username)} style={{ cursor: 'pointer' }}>
               <td>{utente.username}</td>
               <td>{utente.email}</td>
-              <td>{utente.dataCreazione}</td>
-              <td>{utente.dataUltimaModifica}</td>
-              <td>{utente.ruolo}</td>
+              <td>{utente.createdDate ? new Date(utente.createdDate).toLocaleDateString('it-IT') : 'N/A'}</td>
+              <td>{utente.updatedDate ? new Date(utente.updatedDate).toLocaleDateString('it-IT') : 'N/A'}</td>
+
               <td>
-                {selectedRow === utenti.username && (
+                  {utente.Roles?.map(ruolo => ruolo.name).join(', ')}
+              </td>
+              <td>
+                {selectedRow === utente.username && (
                   <div style={{display:'block'}}>
                     <button onClick={() => { openModifyModal(utente); }} className="btn btn-primary mr-2">MODIFICA</button>
                     <button onClick={() => { openDeleteModal(utente); }} className="btn btn-danger">ELIMINA</button>
@@ -115,7 +120,7 @@ function Utenti() {
           ))}
         </tbody>
       </table>
-      {isOpen && <Modal chose={chose} utente={selectedData} onClose={closeModal} />}
+      <Modal chose={chose} utente={selectedData} onClose={closeModal} onDelete={handleDeleteUser} />
     </div>
   );
 }
